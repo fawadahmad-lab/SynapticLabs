@@ -1408,6 +1408,14 @@
                 position: { lat: 24.8607, lng: 67.0183 }
             });
 
+            // Hide loader, keep fallback hidden
+            const mapLoader = document.getElementById('mapLoader');
+            const mapFallback = document.getElementById('mapFallback');
+            if (mapLoader && mapFallback) {
+                mapLoader.classList.add('hidden');
+                // mapFallback already has 'hidden' class from initGoogleMaps, keep it hidden
+            }
+
             // Make map responsive container resize
             window.addEventListener('resize', () => {
                 mapContainer.style.height = '400px';
