@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synaptic Labs — Engineering Intelligence. Automating Possibilities.</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            base: '#07111F',
+                            surface: '#0B1728',
+                            card: '#101D30',
+                            border: '#18283B',
+                            line: '#25384B'
+                        },
+                        cyan: {
+                            accent: '#51D7D8',
+                            glow: 'rgba(81, 215, 216, 0.15)'
+                        },
+                        blue: {
+                            subtle: '#547BBD'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom Architectural Scrollbar & Grid Styles */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07111F;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #18283B;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #51D7D8;
+        }
+
+        .grid-bg-pattern {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(37, 56, 75, 0.25) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(37, 56, 75, 0.25) 1px, transparent 1px);
+        }
+
+        .border-technical {
+            border-color: rgba(37, 56, 75, 0.6);
+        }
+
+        .glow-cyan-sm {
+            box-shadow: 0 0 15px rgba(81, 215, 216, 0.12);
+        }
+
+        /* Architectural line animation */
+        @keyframes lineScan {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(1000%); opacity: 0; }
+        }
+
+        .scan-line {
+            animation: lineScan 8s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-navy-base text-[#E8EDF5] font-sans antialiased selection:bg-cyan-accent selection:text-navy-base relative overflow-x-hidden">
+
+    <!-- CANVAS ARCHITECTURAL BACKGROUND -->
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-40">
+        <canvas id="wireframeCanvas" class="w-full h-full"></canvas>
+        <div class="absolute inset-0 bg-gradient-to-b from-navy-base/60 via-transparent to-navy-base"></div>
+    </div>
+
+    <!-- MAIN WRAPPER WITH GRID LINES OVERLAY -->
+    <div class="relative z-10 grid-bg-pattern min-h-screen">
+
+        <!-- HEADER / NAVIGATION -->
+        <header class="sticky top-0 z-50 backdrop-blur-md bg-navy-base/85 border-b border-navy-border/80 transition-all duration-300">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <!-- Wordmark -->
+                <a href="#hero" class="flex items-center gap-3 group">
+                    <div class="w-7 h-7 border border-cyan-accent/60 flex items-center justify-center transition-transform group-hover:rotate-45 duration-500">
+                        <div class="w-2 h-2 bg-cyan-accent"></div>
+                    </div>
+                    <span class="font-mono tracking-[0.2em] text-sm uppercase text-white font-medium">SYNAPTIC <span class="text-cyan-accent">LABS</span></span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-8 font-mono text-xs tracking-wider text-navy-200">
+                    <a href="#about" class="hover:text-cyan-accent transition-colors py-1">01. ABOUT</a>
+                    <a href="#services" class="hover:text-cyan-accent transition-colors py-1">02. SERVICES</a>
+                    <a href="#industries" class="hover:text-cyan-accent transition-colors py-1">03. INDUSTRIES</a>
+                    <a href="#approach" class="hover:text-cyan-accent transition-colors py-1">04. APPROACH</a>
+                    <a href="#work" class="hover:text-cyan-accent transition-colors py-1">05. WORK</a>
+                </nav>
+
+                <!-- CTA & Mobile Toggle -->
+                <div class="flex items-center gap-4">
+                    <button onclick="openProjectModal()" class="hidden sm:inline-flex items-center gap-2 border border-cyan-accent/40 bg-navy-surface/50 hover:bg-cyan-accent hover:text-navy-base text-cyan-accent text-xs font-mono tracking-widest px-5 py-2.5 transition-all duration-300 hover:shadow-[0_0_15px_rgba(81,215,216,0.3)]">
+                        <span>START A PROJECT</span>
+                        <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                    </button>
+
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-400 hover:text-white focus:outline-none">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Dropdown Menu -->
+            <div id="mobileMenu" class="hidden md:hidden border-b border-navy-border bg-navy-surface px-6 py-6 space-y-4 font-mono text-xs tracking-wider">
+                <a href="#about" onclick="toggleMobileMenu()" class="block text-gray-300 hover:text-cyan-accent py-2 border-b border-navy-border/40">01. ABOUT</a>
+                <a href="#services" onclick="toggleMobileMenu()" class="block text-gray-300 hover:text-cyan-accent py-2 border-b border-navy-border/40">02. SERVICES</a>
+                <a href="#industries" onclick="toggleMobileMenu()" class="block text-gray-300 hover:text-cyan-accent py-2 border-b border-navy-border/40">03. INDUSTRIES</a>
+                <a href="#approach" onclick="toggleMobileMenu()" class="block text-gray-300 hover:text-cyan-accent py-2 border-b border-navy-border/40">04. APPROACH</a>
+                <a href="#work" onclick="toggleMobileMenu()" class="block text-gray-300 hover:text-cyan-accent py-2 border-b border-navy-border/40">05. WORK</a>
+                <button onclick="toggleMobileMenu(); openProjectModal()" class="w-full mt-4 text-center border border-cyan-accent text-cyan-accent py-3 font-mono text-xs">
+                    START A PROJECT
+                </button>
+            </div>
+        </header>
+
+        <!-- HERO SECTION -->
+        <section id="hero" class="relative pt-20 pb-28 md:pt-32 md:pb-40 border-b border-navy-border overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-4xl">
+                    <!-- Eyebrow -->
+                    <div class="inline-flex items-center gap-3 px-3 py-1.5 border border-navy-border bg-navy-surface/80 text-cyan-accent font-mono text-[11px] tracking-[0.25em] uppercase mb-8">
+                        <span class="w-1.5 h-1.5 bg-cyan-accent rounded-full animate-pulse"></span>
+                        AI ENGINEERING STUDIO · INTELLIGENT AUTOMATION
+                    </div>
+
+                    <!-- Editorial Serif Headline -->
+                    <h1 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-normal leading-[1.05] tracking-tight text-white mb-8">
+                        We engineer <em class="font-serif italic text-cyan-accent font-normal">intelligent</em> systems that move business forward.
+                    </h1>
+
+                    <!-- Monospaced / Sans Subtitle -->
+                    <p class="font-mono text-sm sm:text-base text-gray-400 max-w-2xl leading-relaxed mb-12">
+                        From custom AI agents and voice automation to connected data systems and intelligent business workflows, Synaptic Labs builds technology that turns operational complexity into opportunity.
+                    </p>
+
+                    <!-- CTAs -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-5">
+                        <button onclick="openProjectModal()" class="inline-flex items-center justify-center gap-3 bg-cyan-accent hover:bg-cyan-accent/90 text-navy-base font-mono text-xs tracking-widest font-semibold px-8 py-4 transition-all duration-300 shadow-[0_0_20px_rgba(81,215,216,0.2)]">
+                            <span>DISCUSS YOUR PROJECT</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                        
+                        <a href="#services" class="inline-flex items-center justify-center gap-3 border border-navy-border hover:border-cyan-accent/50 bg-navy-surface/40 text-gray-300 hover:text-white font-mono text-xs tracking-widest px-8 py-4 transition-all duration-300">
+                            <span>EXPLORE CAPABILITIES</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architectural Micro-Graphic overlay -->
+            <div class="hidden lg:block absolute right-8 bottom-12 font-mono text-[10px] text-navy-line/80 space-y-1 text-right">
+                <p>SYS.LOC // 37.7749° N, 122.4194° W</p>
+                <p>MESH.GRID // PARAMETRIC CURVATURE v4.2</p>
+                <p>LATENCY // &lt; 12ms REAL-TIME DISPATCH</p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: METRICS & PILLARS RIBBON -->
+        <section class="border-b border-navy-border bg-navy-surface/40 backdrop-blur-sm">
+            <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-navy-border">
+                <div class="p-6 md:p-8 flex flex-col justify-between">
+                    <span class="font-mono text-[10px] tracking-widest text-cyan-accent mb-2">01 // CORE</span>
+                    <h3 class="font-mono text-xs sm:text-sm tracking-wider text-white font-medium uppercase">AI ENGINEERING</h3>
+                    <p class="font-mono text-[11px] text-gray-500 mt-2">LLMs, RAG, custom agentic workflows</p>
+                </div>
+                <div class="p-6 md:p-8 flex flex-col justify-between">
+                    <span class="font-mono text-[10px] tracking-widest text-cyan-accent mb-2">02 // TAILORED</span>
+                    <h3 class="font-mono text-xs sm:text-sm tracking-wider text-white font-medium uppercase">CUSTOM SOLUTIONS</h3>
+                    <p class="font-mono text-[11px] text-gray-500 mt-2">Bespoke software for exact business rules</p>
+                </div>
+                <div class="p-6 md:p-8 flex flex-col justify-between">
+                    <span class="font-mono text-[10px] tracking-widest text-cyan-accent mb-2">03 // SCALE</span>
+                    <h3 class="font-mono text-xs sm:text-sm tracking-wider text-white font-medium uppercase">BUSINESS AUTOMATION</h3>
+                    <p class="font-mono text-[11px] text-gray-500 mt-2">Eliminating repetitive operational overhead</p>
+                </div>
+                <div class="p-6 md:p-8 flex flex-col justify-between">
+                    <span class="font-mono text-[10px] tracking-widest text-cyan-accent mb-2">04 // LIFECYCLE</span>
+                    <h3 class="font-mono text-xs sm:text-sm tracking-wider text-white font-medium uppercase">END-TO-END DELIVERY</h3>
+                    <p class="font-mono text-[11px] text-gray-500 mt-2">From architectural audit to deployment</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: INTRODUCTION ("WHAT WE DO") -->
+        <section id="about" class="py-24 border-b border-navy-border relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+                    <div class="lg:col-span-4 space-y-4">
+                        <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block">WHAT WE DO</span>
+                        <h2 class="font-serif text-3xl sm:text-4xl text-white font-normal leading-snug">
+                            Complex business challenges deserve <em class="italic text-cyan-accent">intelligent</em> engineering.
+                        </h2>
+                    </div>
+
+                    <div class="lg:col-span-8 space-y-8 font-mono text-sm sm:text-base text-gray-400 leading-relaxed">
+                        <p class="text-gray-300 text-lg font-serif">
+                            Every business has processes that consume valuable time, fragmented information that slows strategic decision-making, and hidden operational capabilities that go unfulfilled.
+                        </p>
+                        <p>
+                            We engineer custom AI systems to connect these fragmented pieces and fundamentally transform how modern businesses operate. Rather than wrapping simple prompts in shallow interfaces, we build deep integrations into enterprise data pipelines, voice infrastructure, and automated back-office workflows.
+                        </p>
+
+                        <!-- Architectural Technical Grid Card -->
+                        <div class="p-6 border border-navy-border bg-navy-card/60 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-3 text-navy-line font-mono text-[10px]">FIG 1.0 — SYSTEM FLOW</div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+                                <div class="border-l-2 border-cyan-accent/40 pl-4">
+                                    <div class="text-white text-xs font-semibold mb-1">FRAGMENTED DATA</div>
+                                    <div class="text-[11px] text-gray-500">CRMs, ERPs, unstructured PDFs, internal knowledge.</div>
+                                </div>
+                                <div class="border-l-2 border-cyan-accent/40 pl-4">
+                                    <div class="text-white text-xs font-semibold mb-1">SYNAPTIC ENGINE</div>
+                                    <div class="text-[11px] text-gray-500">Vector search, fine-tuned models, autonomous routing.</div>
+                                </div>
+                                <div class="border-l-2 border-cyan-accent pl-4">
+                                    <div class="text-white text-xs font-semibold mb-1">ACTIONABLE OUTPUT</div>
+                                    <div class="text-[11px] text-gray-500">Instant client support, auto-reconciliation, lead capture.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: SERVICES ("OUR CAPABILITIES") -->
+        <section id="services" class="py-24 border-b border-navy-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+                    <div>
+                        <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-3">OUR CAPABILITIES</span>
+                        <h2 class="font-serif text-4xl sm:text-5xl text-white">Technology designed around the way <em class="italic text-cyan-accent">businesses work</em>.</h2>
+                    </div>
+                    <p class="font-mono text-xs text-gray-400 max-w-sm">Editorial capabilities breakdown. Select a module to inspect architectural scope.</p>
+                </div>
+
+                <!-- 5 Interactive Service Modules -->
+                <div class="space-y-4">
+                    <!-- Service 01 -->
+                    <div class="service-card border border-navy-border bg-navy-surface/30 hover:border-cyan-accent/50 transition-all duration-300">
+                        <button onclick="toggleService(1)" class="w-full p-6 sm:p-8 text-left flex items-center justify-between gap-4">
+                            <div class="flex items-baseline gap-6 sm:gap-12">
+                                <span class="font-serif text-2xl sm:text-4xl text-cyan-accent font-light">01</span>
+                                <div>
+                                    <h3 class="font-serif text-2xl sm:text-3xl text-white font-normal">CUSTOM AI SOLUTIONS</h3>
+                                    <p class="font-mono text-xs text-gray-400 mt-1">Knowledge management, enterprise search, and bespoke LLMs.</p>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border border-navy-border flex items-center justify-center text-gray-400 service-icon-1">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </div>
+                        </button>
+                        <div id="service-body-1" class="hidden px-6 pb-8 sm:px-8 sm:pb-8 pt-2 border-t border-navy-border/50">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 font-mono text-xs text-gray-300">
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// PRIVATE KNOWLEDGE ASSISTANTS</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Secure, enterprise-grade AI assistants trained on internal policy documents, databases, and codebases.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// DOCUMENT Q&amp;A &amp; RAG SYSTEMS</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Retrieval-Augmented Generation for semantic search across millions of unstructured unstructured PDFs and spreadsheets.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// EDUCATIONAL ASSISTANTS</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Personalized tutoring engines and internal staff onboarding AI tailored to specialized domains.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service 02 -->
+                    <div class="service-card border border-navy-border bg-navy-surface/30 hover:border-cyan-accent/50 transition-all duration-300">
+                        <button onclick="toggleService(2)" class="w-full p-6 sm:p-8 text-left flex items-center justify-between gap-4">
+                            <div class="flex items-baseline gap-6 sm:gap-12">
+                                <span class="font-serif text-2xl sm:text-4xl text-cyan-accent font-light">02</span>
+                                <div>
+                                    <h3 class="font-serif text-2xl sm:text-3xl text-white font-normal">VOICE AI &amp; CONVERSATIONAL SYSTEMS</h3>
+                                    <p class="font-mono text-xs text-gray-400 mt-1">Autonomous inbound/outbound telephony &amp; human-grade vocal synthesis.</p>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border border-navy-border flex items-center justify-center text-gray-400 service-icon-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </div>
+                        </button>
+                        <div id="service-body-2" class="hidden px-6 pb-8 sm:px-8 sm:pb-8 pt-2 border-t border-navy-border/50">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 font-mono text-xs text-gray-300">
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// AI VOICE RECEPTIONISTS</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Sub-500ms voice response pipelines handling 24/7 inbound call concurrency with natural inflection.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// LEAD QUALIFICATION</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Autonomous phone screeners that evaluate caller intent, extract metadata, and update CRM records live.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// APPOINTMENT SCHEDULING</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Direct integration into calendar APIs to negotiate booking slots without human intervention.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service 03 -->
+                    <div class="service-card border border-navy-border bg-navy-surface/30 hover:border-cyan-accent/50 transition-all duration-300">
+                        <button onclick="toggleService(3)" class="w-full p-6 sm:p-8 text-left flex items-center justify-between gap-4">
+                            <div class="flex items-baseline gap-6 sm:gap-12">
+                                <span class="font-serif text-2xl sm:text-4xl text-cyan-accent font-light">03</span>
+                                <div>
+                                    <h3 class="font-serif text-2xl sm:text-3xl text-white font-normal">INTELLIGENT WORKFLOW AUTOMATION</h3>
+                                    <p class="font-mono text-xs text-gray-400 mt-1">Multi-agent orchestration and operational process optimization.</p>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border border-navy-border flex items-center justify-center text-gray-400 service-icon-3">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </div>
+                        </button>
+                        <div id="service-body-3" class="hidden px-6 pb-8 sm:px-8 sm:pb-8 pt-2 border-t border-navy-border/50">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 font-mono text-xs text-gray-300">
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// AGENTIC WORKFLOWS</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Autonomous multi-step agents that execute complex cross-platform operational sequences.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// CRM &amp; API INTEGRATION</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Custom middleware connecting Salesforce, HubSpot, Zendesk, and legacy SQL setups.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// EXCEPTION HANDLING</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Human-in-the-loop fallback mechanisms ensuring total operational reliability.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service 04 -->
+                    <div class="service-card border border-navy-border bg-navy-surface/30 hover:border-cyan-accent/50 transition-all duration-300">
+                        <button onclick="toggleService(4)" class="w-full p-6 sm:p-8 text-left flex items-center justify-between gap-4">
+                            <div class="flex items-baseline gap-6 sm:gap-12">
+                                <span class="font-serif text-2xl sm:text-4xl text-cyan-accent font-light">04</span>
+                                <div>
+                                    <h3 class="font-serif text-2xl sm:text-3xl text-white font-normal">DATA INTELLIGENCE &amp; INTEGRATION</h3>
+                                    <p class="font-mono text-xs text-gray-400 mt-1">Automated reconciliation, ETL pipelines, and unified analytics.</p>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border border-navy-border flex items-center justify-center text-gray-400 service-icon-4">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </div>
+                        </button>
+                        <div id="service-body-4" class="hidden px-6 pb-8 sm:px-8 sm:pb-8 pt-2 border-t border-navy-border/50">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 font-mono text-xs text-gray-300">
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// AUTOMATED RECONCILIATION</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Algorithmic matching of invoices, ledger entries, and transactional records.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// DISCONNECTED DATABASE BRIDGING</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Synthesizing isolated data silos into single source of truth analytics dashboards.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// INTELLIGENT EXTRACTION</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">OCR and semantic parsing of complex receipts, contracts, and financial statements.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service 05 -->
+                    <div class="service-card border border-navy-border bg-navy-surface/30 hover:border-cyan-accent/50 transition-all duration-300">
+                        <button onclick="toggleService(5)" class="w-full p-6 sm:p-8 text-left flex items-center justify-between gap-4">
+                            <div class="flex items-baseline gap-6 sm:gap-12">
+                                <span class="font-serif text-2xl sm:text-4xl text-cyan-accent font-light">05</span>
+                                <div>
+                                    <h3 class="font-serif text-2xl sm:text-3xl text-white font-normal">AI ENGINEERING &amp; DEVELOPMENT</h3>
+                                    <p class="font-mono text-xs text-gray-400 mt-1">Full-stack AI deployment, model fine-tuning, and scalable architecture.</p>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border border-navy-border flex items-center justify-center text-gray-400 service-icon-5">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </div>
+                        </button>
+                        <div id="service-body-5" class="hidden px-6 pb-8 sm:px-8 sm:pb-8 pt-2 border-t border-navy-border/50">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 font-mono text-xs text-gray-300">
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// CUSTOM AI APPLICATIONS</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Tailored web/mobile user interfaces specifically designed for AI-first user experiences.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// FINE-TUNING &amp; PREDICTIVE ANALYTICS</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">Custom model training on domain specific datasets with strict parameter controls.</p>
+                                </div>
+                                <div class="bg-navy-card/60 p-4 border border-navy-border">
+                                    <div class="text-cyan-accent mb-2 font-semibold">/// ENTERPRISE DEPLOYMENT</div>
+                                    <p class="text-gray-400 text-[11px] leading-relaxed">SOC2-compliant cloud deployments across AWS, GCP, Azure, or on-premise hardware.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: INDUSTRIES WE WORK WITH -->
+        <section id="industries" class="py-24 border-b border-navy-border bg-navy-surface/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-12">
+                    <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-3">INDUSTRIES WE WORK WITH</span>
+                    <h2 class="font-serif text-4xl sm:text-5xl text-white">One engineering capability. <em class="italic text-cyan-accent">Multiple industries.</em></h2>
+                </div>
+
+                <!-- Industry Selector Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Banking & Finance -->
+                    <div class="p-6 border border-navy-border bg-navy-surface/50 hover:border-cyan-accent/50 transition-all duration-300 group">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="landmark" class="w-5 h-5 text-cyan-accent"></i>
+                            <span class="font-mono text-[10px] text-gray-500">01 / FIN</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-white mb-2">BANKING &amp; FINANCE</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">Intelligent reconciliation, automated financial document processing, and compliance reporting.</p>
+                    </div>
+
+                    <!-- Automotive -->
+                    <div class="p-6 border border-navy-border bg-navy-surface/50 hover:border-cyan-accent/50 transition-all duration-300 group">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="car" class="w-5 h-5 text-cyan-accent"></i>
+                            <span class="font-mono text-[10px] text-gray-500">02 / AUTO</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-white mb-2">AUTOMOTIVE</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">Dealership voice receptionists, dynamic inventory assistants, and automated buyer lead capture.</p>
+                    </div>
+
+                    <!-- Agriculture -->
+                    <div class="p-6 border border-navy-border bg-navy-surface/50 hover:border-cyan-accent/50 transition-all duration-300 group">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="sprout" class="w-5 h-5 text-cyan-accent"></i>
+                            <span class="font-mono text-[10px] text-gray-500">03 / AGRI</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-white mb-2">AGRICULTURE</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">Production intelligence systems, yield predictive monitoring, and supply-chain logistics dispatch.</p>
+                    </div>
+
+                    <!-- Legal Services -->
+                    <div class="p-6 border border-navy-border bg-navy-surface/50 hover:border-cyan-accent/50 transition-all duration-300 group">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="scale" class="w-5 h-5 text-cyan-accent"></i>
+                            <span class="font-mono text-[10px] text-gray-500">04 / LEGAL</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-white mb-2">LEGAL SERVICES</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">Private case law semantic discovery, contract risk analysis, and voice intake receptionists.</p>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="p-6 border border-navy-border bg-navy-surface/50 hover:border-cyan-accent/50 transition-all duration-300 group">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="graduation-cap" class="w-5 h-5 text-cyan-accent"></i>
+                            <span class="font-mono text-[10px] text-gray-500">05 / EDU</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-white mb-2">EDUCATION</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">Domain-specific educational tutors, administrative workflow bots, and grading tools.</p>
+                    </div>
+
+                    <!-- Real Estate -->
+                    <div class="p-6 border border-navy-border bg-navy-surface/50 hover:border-cyan-accent/50 transition-all duration-300 group">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="building-2" class="w-5 h-5 text-cyan-accent"></i>
+                            <span class="font-mono text-[10px] text-gray-500">06 / RE</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-white mb-2">REAL ESTATE</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">Automated buyer qualification, lease document parsing, and dynamic property inquiry bots.</p>
+                    </div>
+
+                    <!-- Healthcare -->
+                    <div class="p-6 border border-navy-border bg-navy-surface/50 hover:border-cyan-accent/50 transition-all duration-300 group">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="activity" class="w-5 h-5 text-cyan-accent"></i>
+                            <span class="font-mono text-[10px] text-gray-500">07 / HEALTH</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-white mb-2">HEALTHCARE</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">Patient triage scheduling, HIPAA-compliant document summaries, and lab result routing.</p>
+                    </div>
+
+                    <!-- Retail & E-commerce -->
+                    <div class="p-6 border border-navy-border bg-navy-surface/50 hover:border-cyan-accent/50 transition-all duration-300 group">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="shopping-bag" class="w-5 h-5 text-cyan-accent"></i>
+                            <span class="font-mono text-[10px] text-gray-500">08 / RETAIL</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-white mb-2">RETAIL &amp; E-COMMERCE</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">Predictive demand forecasting, dynamic personalized search, and instant return automation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: OUR APPROACH -->
+        <section id="approach" class="py-24 border-b border-navy-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl mb-16">
+                    <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-3">OUR APPROACH</span>
+                    <h2 class="font-serif text-4xl sm:text-5xl text-white">From business complexity to <em class="italic text-cyan-accent">intelligent systems</em>.</h2>
+                </div>
+
+                <!-- Step-by-step Architectural Flow -->
+                <div class="relative grid grid-cols-1 md:grid-cols-5 gap-6">
+                    <!-- Connecting line for desktop -->
+                    <div class="hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-navy-border z-0"></div>
+
+                    <!-- Step 01 -->
+                    <div class="relative z-10 bg-navy-base border border-navy-border p-6 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="w-10 h-10 rounded-full bg-navy-surface border border-cyan-accent text-cyan-accent font-mono text-xs font-semibold flex items-center justify-center mb-6">01</div>
+                            <h3 class="font-serif text-xl text-white mb-2">DISCOVER</h3>
+                            <p class="font-mono text-xs text-gray-400 leading-relaxed">Uncover operational bottlenecks, map data structures, and define core quantifiable ROI parameters.</p>
+                        </div>
+                        <span class="font-mono text-[10px] text-cyan-accent mt-6 block">STAGE 01 // AUDIT</span>
+                    </div>
+
+                    <!-- Step 02 -->
+                    <div class="relative z-10 bg-navy-base border border-navy-border p-6 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="w-10 h-10 rounded-full bg-navy-surface border border-navy-border text-gray-300 font-mono text-xs font-semibold flex items-center justify-center mb-6">02</div>
+                            <h3 class="font-serif text-xl text-white mb-2">ARCHITECT</h3>
+                            <p class="font-mono text-xs text-gray-400 leading-relaxed">Design custom agent topologies, model fallback logic, and secure system data pipelines.</p>
+                        </div>
+                        <span class="font-mono text-[10px] text-cyan-accent mt-6 block">STAGE 02 // DESIGN</span>
+                    </div>
+
+                    <!-- Step 03 -->
+                    <div class="relative z-10 bg-navy-base border border-navy-border p-6 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="w-10 h-10 rounded-full bg-navy-surface border border-navy-border text-gray-300 font-mono text-xs font-semibold flex items-center justify-center mb-6">03</div>
+                            <h3 class="font-serif text-xl text-white mb-2">ENGINEER</h3>
+                            <p class="font-mono text-xs text-gray-400 leading-relaxed">Build fine-tuned systems, integrate voice APIs, and construct robust custom software layers.</p>
+                        </div>
+                        <span class="font-mono text-[10px] text-cyan-accent mt-6 block">STAGE 03 // BUILD</span>
+                    </div>
+
+                    <!-- Step 04 -->
+                    <div class="relative z-10 bg-navy-base border border-navy-border p-6 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="w-10 h-10 rounded-full bg-navy-surface border border-navy-border text-gray-300 font-mono text-xs font-semibold flex items-center justify-center mb-6">04</div>
+                            <h3 class="font-serif text-xl text-white mb-2">DEPLOY</h3>
+                            <p class="font-mono text-xs text-gray-400 leading-relaxed">Seamlessly introduce system solutions into client operational environments with zero downtime.</p>
+                        </div>
+                        <span class="font-mono text-[10px] text-cyan-accent mt-6 block">STAGE 04 // RELEASE</span>
+                    </div>
+
+                    <!-- Step 05 -->
+                    <div class="relative z-10 bg-navy-base border border-navy-border p-6 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="w-10 h-10 rounded-full bg-navy-surface border border-navy-border text-gray-300 font-mono text-xs font-semibold flex items-center justify-center mb-6">05</div>
+                            <h3 class="font-serif text-xl text-white mb-2">OPTIMIZE</h3>
+                            <p class="font-mono text-xs text-gray-400 leading-relaxed">Continuous latency monitoring, accuracy evaluations, and scaling data models over time.</p>
+                        </div>
+                        <span class="font-mono text-[10px] text-cyan-accent mt-6 block">STAGE 05 // SCALE</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: SELECTED WORK (CASE STUDIES) -->
+        <section id="work" class="py-24 border-b border-navy-border bg-navy-surface/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+                    <div>
+                        <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-3">ENGINEERED SOLUTIONS</span>
+                        <h2 class="font-serif text-4xl sm:text-5xl text-white">Practical intelligence. <em class="italic text-cyan-accent">Built for real operations.</em></h2>
+                    </div>
+                </div>
+
+                <!-- Case Study Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Case Study 1 -->
+                    <div class="border border-navy-border bg-navy-card/80 p-8 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-navy-border pb-4 mb-6">
+                                <span class="font-mono text-xs text-cyan-accent">CASE STUDY // 01</span>
+                                <span class="font-mono text-xs text-gray-500">VOICE &amp; TELEPHONY</span>
+                            </div>
+                            <h3 class="font-serif text-3xl text-white mb-3">Autonomous Automotive Intake Engine</h3>
+                            <p class="font-mono text-xs text-gray-400 mb-6 leading-relaxed">
+                                High-volume dealership group needed to process over 4,000 monthly inbound calls without increasing call center headcount or suffering missed service bookings.
+                            </p>
+                            
+                            <!-- Architectural Blueprint Details -->
+                            <div class="space-y-3 font-mono text-xs bg-navy-base p-4 border border-navy-border/60 mb-6">
+                                <div class="flex justify-between"><span class="text-gray-500">CHALLENGE:</span> <span class="text-gray-300">Peak call overload &amp; missed leads</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">SOLUTION:</span> <span class="text-gray-300">Custom ultra-low latency Voice AI</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">TECH STACK:</span> <span class="text-cyan-accent">Twilio / WebSockets / Fine-Tuned Llama3</span></div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-navy-border/60 flex items-center justify-between">
+                            <span class="font-mono text-[11px] text-gray-400">99.4% intent routing accuracy</span>
+                            <button onclick="openProjectModal('Voice Intake AI')" class="font-mono text-xs text-cyan-accent hover:underline flex items-center gap-1">
+                                DISCUSS SIMILAR SYSTEM <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Case Study 2 -->
+                    <div class="border border-navy-border bg-navy-card/80 p-8 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-navy-border pb-4 mb-6">
+                                <span class="font-mono text-xs text-cyan-accent">CASE STUDY // 02</span>
+                                <span class="font-mono text-xs text-gray-500">ENTERPRISE RAG</span>
+                            </div>
+                            <h3 class="font-serif text-3xl text-white mb-3">Private Document Intelligence Network</h3>
+                            <p class="font-mono text-xs text-gray-400 mb-6 leading-relaxed">
+                                National legal defense practice required secure, offline-capable instant searching across 20+ years of dense litigation archives and evidentiary files.
+                            </p>
+                            
+                            <!-- Architectural Blueprint Details -->
+                            <div class="space-y-3 font-mono text-xs bg-navy-base p-4 border border-navy-border/60 mb-6">
+                                <div class="flex justify-between"><span class="text-gray-500">CHALLENGE:</span> <span class="text-gray-300">Slow manual contract research</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">SOLUTION:</span> <span class="text-gray-300">Hybrid Vector RAG + Citation Verification</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">TECH STACK:</span> <span class="text-cyan-accent">Qdrant / Milvus / Custom Embeddings</span></div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-navy-border/60 flex items-center justify-between">
+                            <span class="font-mono text-[11px] text-gray-400">Sub-second citations across 1M+ docs</span>
+                            <button onclick="openProjectModal('Enterprise RAG')" class="font-mono text-xs text-cyan-accent hover:underline flex items-center gap-1">
+                                DISCUSS SIMILAR SYSTEM <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: WHY SYNAPTIC LABS (DIFFERENTIATORS) -->
+        <section class="py-24 border-b border-navy-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-3">WHY SYNAPTIC LABS</span>
+                    <h2 class="font-serif text-4xl sm:text-5xl text-white">Not another layer of software. <em class="italic text-cyan-accent">A smarter way to operate.</em></h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="p-8 border border-navy-border bg-navy-surface/40">
+                        <div class="w-8 h-8 text-cyan-accent font-mono text-sm border border-navy-border flex items-center justify-center mb-6">01</div>
+                        <h3 class="font-serif text-2xl text-white mb-3">Custom Architecture</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">
+                            We do not resell generic SaaS wrappers. Every system is purpose-engineered to fit your exact operational logic and database schema.
+                        </p>
+                    </div>
+
+                    <div class="p-8 border border-navy-border bg-navy-surface/40">
+                        <div class="w-8 h-8 text-cyan-accent font-mono text-sm border border-navy-border flex items-center justify-center mb-6">02</div>
+                        <h3 class="font-serif text-2xl text-white mb-3">Business-First Engineering</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">
+                            We focus exclusively on measurable business value: hours saved, error rates slashed, speed increased, and revenue unlocked.
+                        </p>
+                    </div>
+
+                    <div class="p-8 border border-navy-border bg-navy-surface/40">
+                        <div class="w-8 h-8 text-cyan-accent font-mono text-sm border border-navy-border flex items-center justify-center mb-6">03</div>
+                        <h3 class="font-serif text-2xl text-white mb-3">Seamless Integration</h3>
+                        <p class="font-mono text-xs text-gray-400 leading-relaxed">
+                            Our solutions integrate directly into your legacy infrastructure—no need to scrap existing databases or disrupt daily operations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 10: FINAL CTA -->
+        <section class="py-28 relative overflow-hidden">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-4">START THE CONVERSATION</span>
+                <h2 class="font-serif text-5xl sm:text-7xl text-white mb-6">Let's engineer <em class="italic text-cyan-accent">what's next</em>.</h2>
+                <p class="font-mono text-sm sm:text-base text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                    Tell us about your business challenges. We'll help you identify where custom AI and intelligent automation can create measurable competitive leverage.
+                </p>
+                <button onclick="openProjectModal()" class="inline-flex items-center justify-center gap-3 bg-cyan-accent hover:bg-cyan-accent/90 text-navy-base font-mono text-xs tracking-widest font-semibold px-10 py-5 transition-all duration-300 shadow-[0_0_25px_rgba(81,215,216,0.3)]">
+                    <span>START A CONVERSATION</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 12: CONTACT -->
+        <section id="contact" class="py-24 border-b border-navy-border relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Contact Hero -->
+                <div class="max-w-4xl mb-20">
+                    <!-- Eyebrow -->
+                    <div class="inline-flex items-center gap-3 px-3 py-1.5 border border-navy-border bg-navy-surface/80 text-cyan-accent font-mono text-[11px] tracking-[0.25em] uppercase mb-8">
+                        <span class="w-1.5 h-1.5 bg-cyan-accent rounded-full animate-pulse"></span>
+                        LET'S BUILD SOMETHING INTELLIGENT
+                    </div>
+
+                    <!-- Main Headline -->
+                    <h1 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-normal leading-[1.05] tracking-tight text-white mb-8">
+                        Have a challenge? Let's engineer the
+                        <em class="font-serif italic text-cyan-accent font-normal solution">solution</em>.
+                    </h1>
+
+                    <!-- Supporting Text -->
+                    <p class="font-mono text-sm sm:text-base text-gray-400 max-w-2xl leading-relaxed mb-12">
+                        Every great solution starts with understanding the problem. Tell us what you're working on, what you'd like to automate, or where your business needs a smarter approach. Our team will explore how we can help.
+                    </p>
+
+                    <!-- Microcopy -->
+                    <p class="font-mono text-xs text-gray-400">From initial idea to production-ready AI systems, let's start the conversation.</p>
+                </div>
+
+                <!-- Main Contact Layout -->
+                <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+                    <!-- Contact Information Column -->
+                    <div class="space-y-8">
+                        <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block">Connect with Synaptic Labs.</span>
+
+                        <p class="font-mono text-base text-gray-400 leading-relaxed mb-8">
+                            Whether you're exploring an AI solution, planning an automation project, or simply looking for technical guidance, we'd be glad to hear from you.
+                        </p>
+
+                        <!-- Email -->
+                        <div class="flex items-center gap-3 mb-4 hover:text-cyan-accent transition-colors cursor-pointer">
+                            <div class="w-5 h-5 text-cyan-accent">
+                                <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <p class="font-mono text-lg font-medium text-white">EMAIL</p>
+                                <a href="mailto:contact.synapticlabs@gmail.com" class="font-mono text-cyan-accent/80 hover:text-cyan-accent block mt-1 break-all">contact.synapticlabs@gmail.com</a>
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="flex items-center gap-3 mb-4 hover:text-cyan-accent transition-colors cursor-pointer">
+                            <div class="w-5 h-5 text-cyan-accent">
+                                <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <p class="font-mono text-lg font-medium text-white">PHONE</p>
+                                <a href="tel:+923130583693" class="font-mono text-cyan-accent/80 hover:text-cyan-accent block mt-1">+92 313 0583693</a>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp -->
+                        <div class="flex items-center gap-3 mb-4 hover:text-cyan-accent transition-colors cursor-pointer">
+                            <div class="w-5 h-5 bg-green-500/20 rounded-full flex items-center justify-center">
+                                <i data-lucide="whatsapp" class="w-3 h-3 text-green-400"></i>
+                            </div>
+                            <div>
+                                <p class="font-mono text-lg font-medium text-white">WHATSAPP</p>
+                                <a href="https://wa.me/923130583693" target="_blank" rel="noopener" class="font-mono text-cyan-accent/80 hover:text-cyan-accent block mt-1">+92 313 0583693</a>
+                            </div>
+                        </div>
+
+                        <!-- Availability -->
+                        <p class="font-mono text-sm text-gray-500 italic mb-8">Open for project inquiries and collaboration.</p>
+
+                        <!-- LinkedIn -->
+                        <div class="flex items-center gap-3 hover:text-cyan-accent transition-colors cursor-pointer">
+                            <div class="w-5 h-5 text-cyan-accent/60">
+                                <i data-lucide="linkedin" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div>
+                                <p class="font-mono text-sm text-cyan-accent/60 hover:text-cyan-accent uppercase tracking-wider">LinkedIn</p>
+                                <a href="#" class="font-mono text-cyan-accent/60 hover:text-cyan-accent underline">linkedin.com/company/synaptic-labs</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Inquiry Form Column -->
+                    <div>
+                        <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-4">Tell us about your project.</span>
+
+                        <p class="font-mono text-sm text-gray-400 leading-relaxed text-left mb-6">
+                            Share a few details so we can understand your requirements and explore the right solution.
+                        </p>
+
+                        <form id="projectInquiryForm" class="space-y-6" onsubmit="handleFormSubmit(event)">
+                            <!-- Full Name -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-2">Full Name</label>
+                                <input type="text" required name="fullName" class="w-full bg-navy-base border border-navy-border p-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-accent transition-colors">
+                            </div>
+
+                            <!-- Business Email -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-2">Business Email</label>
+                                <input type="email" required name="email" class="w-full bg-navy-base border border-navy-border p-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-accent transition-colors">
+                            </div>
+
+                            <!-- Company -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-2">Company / Organization</label>
+                                <input type="text" name="company" class="w-full bg-navy-base border border-navy-border p-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-accent transition-colors">
+                            </div>
+
+                            <!-- Industry -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-2">Industry</label>
+                                <select name="industry" class="w-full bg-navy-base border border-navy-border p-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-accent transition-colors appearance-none py-2 pr-8">
+                                    <option value="" disabled selected>Select an industry</option>
+                                    <option value="Banking & Finance">Banking & Finance</option>
+                                    <option value="Automotive">Automotive</option>
+                                    <option value="Agriculture">Agriculture</option>
+                                    <option value="Legal Services">Legal Services</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Real Estate">Real Estate</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Retail & E-commerce">Retail & E-commerce</option>
+                                    <option value="Technology / IT">Technology / IT</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Service Required -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-2">Service Required</label>
+                                <select name="service" required class="w-full bg-navy-base border border-navy-border p-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-accent transition-colors appearance-none py-2 pr-8">
+                                    <option value="" disabled selected>Select a service</option>
+                                    <option value="Custom AI Chatbot Development">Custom AI Chatbot Development</option>
+                                    <option value="Voice AI Agents">Voice AI Agents</option>
+                                    <option value="Business Process Automation">Business Process Automation</option>
+                                    <option value="Data Integration & Reconciliation">Data Integration & Reconciliation</option>
+                                    <option value="AI Agent Development">AI Agent Development</option>
+                                    <option value="RAG & Private Knowledge Systems">RAG & Private Knowledge Systems</option>
+                                    <option value="Machine Learning Solutions">Machine Learning Solutions</option>
+                                    <option value="Custom AI Software Development">Custom AI Software Development</option>
+                                    <option value="Consultation / Not Sure Yet">Consultation / Not Sure Yet</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Project Budget -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-2">Project Budget</label>
+                                <select name="budget" class="w-full bg-navy-base border border-navy-border p-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-accent transition-colors appearance-none py-2 pr-8">
+                                    <option value="" disabled selected>Not decided yet</option>
+                                    <option value="Under $500">Under $500</option>
+                                    <option value="$500 – $1,000">$500 – $1,000</option>
+                                    <option value="$1,000 – $3,000">$1,000 – $3,000</option>
+                                    <option value="$3,000 – $5,000">$3,000 – $5,000</option>
+                                    <option value="$5,000 – $10,000">$5,000 – $10,000</option>
+                                    <option value="$10,000+">$10,000+</option>
+                                    <option value="Not decided yet">Not decided yet</option>
+                                </select>
+                            </div>
+
+                            <!-- Project Timeline -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-2">Project Timeline</label>
+                                <select name="timeline" class="w-full bg-navy-base border border-navy-border p-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-accent transition-colors appearance-none py-2 pr-8">
+                                    <option value="" disabled selected>Flexible</option>
+                                    <option value="Immediately">Immediately</option>
+                                    <option value="Within 2–4 weeks">Within 2–4 weeks</option>
+                                    <option value="Within 1–3 months">Within 1–3 months</option>
+                                </select>
+                            </div>
+
+                            <!-- Project Description -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-2">Project Description</label>
+                                <textarea rows="5" name="description" placeholder="Tell us about your business, the challenge you're facing, and what you'd like us to build or automate..." class="w-full bg-navy-base border border-navy-border p-3 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-accent transition-colors resize-none"></textarea>
+                            </div>
+
+                            <!-- Preferred Contact Method -->
+                            <div>
+                                <label class="font-mono text-sm text-gray-300 block mb-4">Preferred Contact Method</label>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <label>
+                                        <input type="radio" name="contactMethod" value="email" class="accent-cyan-accent rounded border-none">
+                                        <span class="font-mono text-sm text-gray-300">Email</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="contactMethod" value="phone" class="accent-cyan-accent rounded border-none">
+                                        <span class="font-mono text-sm text-gray-300">Phone</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="contactMethod" value="whatsapp" class="accent-cyan-accent rounded border-none">
+                                        <span class="font-mono text-sm text-gray-300">WhatsApp</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div>
+                                <button type="submit" class="w-full bg-cyan-accent hover:bg-cyan-accent/90 text-navy-base font-mono text-xs tracking-widest font-semibold px-8 py-3.5 transition-all duration-300 shadow-[0_0_20px_rgba(81,215,216,0.2)]">
+                                    <span>Send Project Inquiry →</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+
+                            <!-- Confidentiality Note -->
+                            <p class="font-mono text-xs text-gray-500 italic mt-4">Your project details are treated confidentially. We'll use this information only to respond to your inquiry.</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Google Maps Section -->
+        <section id="maps" class="py-24 border-t border-navy-border bg-navy-surface/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-3">Find Your Way to Us.</span>
+                    <h2 class="font-serif text-4xl sm:text-5xl text-white">Find Your Way to Us.</h2>
+                    <p class="font-mono text-sm sm:text-base text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                        Let's connect and explore what we can build together.
+                    </p>
+                </div>
+
+                <!-- Map Container -->
+                <div class="map-container rounded-lg border border-navy-border/40 overflow-hidden bg-navy-base">
+                    <!-- Fallback Map Preview -->
+                    <div id="mapFallback" class="map-preview p-8 text-center">
+                        <div class="w-full h-64 bg-navy-card/60 border border-navy-border/60 rounded-lg flex items-center justify-center mb-6">
+                            <div class="text-navy-line/60 text-[10px]">🗺️</div>
+                        </div>
+                        <h3 class="font-serif text-2xl text-gray-300 mb-4">Map integration pending</h3>
+                        <p class="font-mono text-sm text-gray-500">The map integration will be activated when the API key and business location are configured.</p>
+                        <p class="font-mono text-sm text-gray-400">Please contact us directly:</p>
+                        <p class="font-mono text-base text-cyan-accent mt-2"><a href="mailto:contact.synapticlabs@gmail.com" class="underline">contact.synapticlabs@gmail.com</a></p>
+                        <p class="font-mono text-base text-cyan-acct mt-1"><a href="tel:+923130583693" class="underline">+92 313 0583693</a></p>
+                    </div>
+
+                    <!-- Google Maps Loader -->
+                    <div id="mapLoader" class="map-preview hidden p-8 text-center">
+                        <div class="w-full h-64 bg-navy-card/60 border border-navy-border/60 rounded-lg flex items-center justify-center mb-6">
+                            <div class="text-navy-line/60 text-[10px]">🗺️</div>
+                        </div>
+                        <p class="font-serif text-xl text-gray-300 mb-4">Loading map...</p>
+                        <p class="font-mono text-sm text-gray-500">Initializing Google Maps API...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alternative Contact CTA -->
+        <section class="py-24 relative overflow-hidden">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-navy-surface/50 rounded-2xl p-8 sm:p-12 border border-navy-border/40 backdrop-blur-md text-center">
+                    <span class="font-mono text-xs tracking-[0.25em] text-cyan-accent uppercase block mb-4">Not sure where to start?</span>
+
+                    <h3 class="font-serif text-3xl sm:text-4xl text-white mb-6">Not sure where to start?</h3>
+
+                    <p class="font-mono text-sm sm:text-base text-gray-400 leading-relaxed mb-8">
+                        Tell us about your business challenge. We'll help you identify where intelligent automation and AI engineering could make a difference.
+                    </p>
+
+                    <div>
+                        <button onclick="document.getElementById('projectInquiryForm').scrollIntoView({behavior: 'smooth'})"  class="inline-flex items-center justify-center gap-3 bg-cyan-accent hover:bg-cyan-accent/90 text-navy-base font-mono text-xs tracking-widest font-semibold px-8 py-3.5 transition-all duration-300 shadow-[0_0_20px_rgba(81,215,216,0.2)]">
+                            <span>Discuss Your Idea</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 11: FOOTER -->
+        <footer class="border-t border-navy-border bg-navy-base py-16 font-mono text-xs text-gray-400">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-12 border-b border-navy-border">
+                    <div class="md:col-span-5 space-y-4">
+                        <a href="#hero" class="flex items-center gap-3">
+                            <div class="w-6 h-6 border border-cyan-accent flex items-center justify-center">
+                                <div class="w-1.5 h-1.5 bg-cyan-accent"></div>
+                            </div>
+                            <span class="font-mono tracking-[0.2em] text-sm uppercase text-white font-medium">SYNAPTIC LABS</span>
+                        </a>
+                        <p class="text-gray-500 max-w-sm leading-relaxed text-[11px]">
+                            AI Engineering &amp; Intelligent Business Automation Studio. Engineering custom intelligence layer for global operations.
+                        </p>
+                    </div>
+
+                    <div class="md:col-span-2 space-y-3">
+                        <span class="text-white text-[11px] tracking-wider block font-semibold">NAVIGATION</span>
+                        <a href="#about" class="block hover:text-cyan-accent transition-colors">About</a>
+                        <a href="#services" class="block hover:text-cyan-accent transition-colors">Services</a>
+                        <a href="#industries" class="block hover:text-cyan-accent transition-colors">Industries</a>
+                        <a href="#approach" class="block hover:text-cyan-accent transition-colors">Approach</a>
+                        <a href="#work" class="block hover:text-cyan-accent transition-colors">Work</a>
+                    </div>
+
+                    <div class="md:col-span-2 space-y-3">
+                        <span class="text-white text-[11px] tracking-wider block font-semibold">SERVICES</span>
+                        <span class="block text-gray-500">Custom AI</span>
+                        <span class="block text-gray-500">Voice Telephony</span>
+                        <span class="block text-gray-500">Workflow Automation</span>
+                        <span class="block text-gray-500">Data Integration</span>
+                    </div>
+
+                    <div class="md:col-span-3 space-y-3">
+                        <span class="text-white text-[11px] tracking-wider block font-semibold">STATUS</span>
+                        <div class="flex items-center gap-2 text-cyan-accent text-[11px]">
+                            <span class="w-2 h-2 rounded-full bg-cyan-accent animate-ping"></span>
+                            <span>ENGINEERING CAPACITY AVAILABLE</span>
+                        </div>
+                        <p class="text-gray-500 text-[11px] pt-2">Q4/Q1 Project Scheduling Open</p>
+                    </div>
+                </div>
+
+                <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-gray-600 text-[11px]">
+                    <p>© 2026 SYNAPTIC LABS INC. ALL RIGHTS RESERVED.</p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="hover:text-cyan-accent">PRIVACY POLICY</a>
+                        <a href="#" class="hover:text-cyan-accent">TERMS OF SERVICE</a>
+                        <a href="#" class="hover:text-cyan-accent">SECURITY</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- INTERACTIVE PROJECT SCOPING MODAL -->
+    <div id="projectModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-navy-base/90 backdrop-blur-md">
+        <div class="bg-navy-surface border border-navy-border w-full max-w-2xl p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeProjectModal()" class="absolute top-6 right-6 text-gray-400 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div id="modalStep1">
+                <span class="font-mono text-xs text-cyan-accent tracking-widest block mb-2">PROJECT SCOPING TOOL // STEP 01</span>
+                <h3 class="font-serif text-3xl text-white mb-2">What capabilities are required?</h3>
+                <p class="font-mono text-xs text-gray-400 mb-6">Select all operational domains that apply to your project.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 font-mono text-xs">
+                    <label class="p-3 border border-navy-border bg-navy-card/50 flex items-center gap-3 cursor-pointer hover:border-cyan-accent">
+                        <input type="checkbox" name="scope" value="Voice AI" class="accent-cyan-accent">
+                        <span class="text-white">Voice AI &amp; Telephony</span>
+                    </label>
+                    <label class="p-3 border border-navy-border bg-navy-card/50 flex items-center gap-3 cursor-pointer hover:border-cyan-accent">
+                        <input type="checkbox" name="scope" value="Knowledge RAG" class="accent-cyan-accent">
+                        <span class="text-white">Private RAG / Knowledge</span>
+                    </label>
+                    <label class="p-3 border border-navy-border bg-navy-card/50 flex items-center gap-3 cursor-pointer hover:border-cyan-accent">
+                        <input type="checkbox" name="scope" value="Workflow Agent" class="accent-cyan-accent">
+                        <span class="text-white">Agentic Workflow Automation</span>
+                    </label>
+                    <label class="p-3 border border-navy-border bg-navy-card/50 flex items-center gap-3 cursor-pointer hover:border-cyan-accent">
+                        <input type="checkbox" name="scope" value="Data ETL" class="accent-cyan-accent">
+                        <span class="text-white">Data Extraction / Integration</span>
+                    </label>
+                </div>
+
+                <div class="flex justify-end">
+                    <button onclick="goToStep2()" class="bg-cyan-accent text-navy-base font-mono text-xs px-6 py-3 font-semibold flex items-center gap-2">
+                        <span>CONTINUE</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="modalStep2" class="hidden">
+                <span class="font-mono text-xs text-cyan-accent tracking-widest block mb-2">PROJECT SCOPING TOOL // STEP 02</span>
+                <h3 class="font-serif text-3xl text-white mb-2">Project Contact &amp; Parameters</h3>
+                <p class="font-mono text-xs text-gray-400 mb-6">Provide your contact info to receive an architectural scope proposal.</p>
+
+                <form onsubmit="handleFormSubmit(event)" class="space-y-4 font-mono text-xs">
+                    <div>
+                        <label class="block text-gray-400 mb-1">YOUR NAME</label>
+                        <input type="text" required placeholder="Jane Doe" class="w-full bg-navy-base border border-navy-border p-3 text-white focus:outline-none focus:border-cyan-accent">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">WORK EMAIL</label>
+                        <input type="email" required placeholder="jane@company.com" class="w-full bg-navy-base border border-navy-border p-3 text-white focus:outline-none focus:border-cyan-accent">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">PROJECT DESCRIPTION</label>
+                        <textarea rows="3" placeholder="Describe the current operational bottlenecks..." class="w-full bg-navy-base border border-navy-border p-3 text-white focus:outline-none focus:border-cyan-accent"></textarea>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4">
+                        <button type="button" onclick="goToStep1()" class="text-gray-400 hover:text-white">BACK</button>
+                        <button type="submit" class="bg-cyan-accent text-navy-base px-6 py-3 font-semibold flex items-center gap-2">
+                            <span>SUBMIT REQUEST</span> <i data-lucide="check" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="modalSuccess" class="hidden text-center py-8">
+                <div class="w-12 h-12 rounded-full border border-cyan-accent text-cyan-accent flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="check" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-serif text-3xl text-white mb-2">Architectural Request Received</h3>
+                <p class="font-mono text-xs text-gray-400 max-w-md mx-auto mb-6">An engineering strategist will analyze your requirements and reach out within 24 business hours.</p>
+                <button onclick="closeProjectModal()" class="border border-navy-border text-white font-mono text-xs px-6 py-3">CLOSE WINDOW</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT FOR CANVAS & INTERACTION -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Canvas 3D Curved Architectural Grid Effect
+        const canvas = document.getElementById('wireframeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let time = 0;
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.lineWidth = 1;
+
+            const cols = 28;
+            const rows = 18;
+            const gridSpacingX = width / cols;
+            const gridSpacingY = height / rows;
+
+            time += 0.008;
+
+            // Render curved 3D Wireframe Perspective Mesh
+            for (let i = 0; i <= cols; i++) {
+                ctx.beginPath();
+                for (let j = 0; j <= rows; j++) {
+                    const x = i * gridSpacingX;
+                    // Mathematical wave equation for curved parametric structure
+                    const distortion = Math.sin(i * 0.2 + time) * Math.cos(j * 0.2 + time) * 25;
+                    const y = j * gridSpacingY + distortion;
+
+                    if (j === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.strokeStyle = (i % 4 === 0) ? 'rgba(81, 215, 216, 0.15)' : 'rgba(37, 56, 75, 0.25)';
+                ctx.stroke();
+            }
+
+            for (let j = 0; j <= rows; j++) {
+                ctx.beginPath();
+                for (let i = 0; i <= cols; i++) {
+                    const x = i * gridSpacingX;
+                    const distortion = Math.sin(i * 0.2 + time) * Math.cos(j * 0.2 + time) * 25;
+                    const y = j * gridSpacingY + distortion;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.strokeStyle = (j % 4 === 0) ? 'rgba(81, 215, 216, 0.12)' : 'rgba(37, 56, 75, 0.2)';
+                ctx.stroke();
+            }
+
+            requestAnimationFrame(drawGrid);
+        }
+
+        drawGrid();
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Service Capabilities Accordion Toggle
+        function toggleService(index) {
+            const body = document.getElementById(`service-body-${index}`);
+            const isHidden = body.classList.contains('hidden');
+            
+            // Close all
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`service-body-${i}`).classList.add('hidden');
+            }
+
+            if (isHidden) {
+                body.classList.remove('hidden');
+            }
+        }
+
+        // Project Modal Logic
+        function openProjectModal(prefill) {
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            goToStep1();
+        }
+
+        function closeProjectModal() {
+            const modal = document.getElementById('projectModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function goToStep1() {
+            document.getElementById('modalStep1').classList.remove('hidden');
+            document.getElementById('modalStep2').classList.add('hidden');
+            document.getElementById('modalSuccess').classList.add('hidden');
+        }
+
+        function goToStep2() {
+            document.getElementById('modalStep1').classList.add('hidden');
+            document.getElementById('modalStep2').classList.remove('hidden');
+            document.getElementById('modalSuccess').classList.add('hidden');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            // Get form elements
+            const form = e.target;
+            const name = form.querySelector('input[name="fullName"]');
+            const email = form.querySelector('input[name="email"]');
+            const industry = form.querySelector('select[name="industry"]');
+            const service = form.querySelector('select[name="service"]');
+            const description = form.querySelector('textarea[name="description"]');
+
+            // Clear previous error styles
+            [name, email, industry, service].forEach(field => {
+                field.style.borderColor = 'var(--navy-border)';
+            });
+
+            // Validation
+            let hasError = false;
+
+            if (!name.value.trim()) {
+                name.style.borderColor = 'rgba(255, 0, 0, 0.4)';
+                hasError = true;
+            }
+
+            if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                email.style.borderColor = 'rgba(255, 0, 0, 0.4)';
+                hasError = true;
+            }
+
+            if (!industry.value) {
+                industry.style.borderColor = 'rgba(255, 0, 0, 0.4)';
+                hasError = true;
+            }
+
+            if (!service.value) {
+                service.style.borderColor = 'rgba(255, 0, 0, 0.4)';
+                hasError = true;
+            }
+
+            if (!description.value.trim()) {
+                description.style.borderColor = 'rgba(255, 0, 0, 0.4)';
+                hasError = true;
+            }
+
+            if (hasError) {
+                return;
+            }
+
+            // Show loading state on the button
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span>Sending...</span>';
+            submitBtn.disabled = true;
+
+            // Prepare form data
+            const formData = {
+                fullName: name.value.trim(),
+                email: email.value.trim(),
+                company: (form.querySelector('input[name="company"]') ? form.querySelector('input[name="company"]').value.trim() : ''),
+                industry: industry.value,
+                service: service.value,
+                budget: form.querySelector('select[name="budget"]') ? form.querySelector('select[name="budget"]').value : '',
+                timeline: form.querySelector('select[name="timeline"]') ? form.querySelector('select[name="timeline"]').value : '',
+                description: description.value.trim(),
+                contactMethod: form.querySelector('input[name="contactMethod"]:checked') ? form.querySelector('input[name="contactMethod"]:checked').value : 'email'
+            };
+
+            // Simulate API submission (in production, this would be a real fetch to a backend endpoint)
+            setTimeout(() => {
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+                // Show success
+                goToStep1();
+                document.getElementById('modalSuccess').classList.remove('hidden');
+                // Reset form
+                form.reset();
+            }, 1500);
+        }
+
+        // Form focus state enhancement
+        document.querySelectorAll('#projectInquiryForm input, #projectInquiryForm select, #projectInquiryForm textarea').forEach(field => {
+            field.addEventListener('focus', () => {
+                field.style.borderColor = 'var(--cyan-accent)';
+            });
+
+            field.addEventListener('blur', () => {
+                // Reset to default border if no error
+                if (field.style.borderColor !== 'rgba(255, 0, 0, 0.4)') {
+                    field.style.borderColor = '';
+                }
+            });
+        });
+
+        // Google Maps API Integration
+        function initGoogleMaps() {
+            // Check for API key - support both build env and plain HTML approaches
+            let apiKey = '';
+
+            // Try NEXT_PUBLIC_GOOGLE_MAPS_API_KEY (Vite/Next.js style)
+            if (typeof import !== 'undefined' && import.meta) {
+                apiKey = import.meta.env?.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+            }
+
+            // Fallback: check meta tag
+            if (!apiKey) {
+                const metaKey = document.querySelector('meta[name="googlemaps-api-key"]');
+                if (metaKey) {
+                    apiKey = metaKey.getAttribute('content') || '';
+                }
+            }
+
+            if (!apiKey || apiKey === 'DEMO_MAPS_API_KEY') {
+                // Show fallback, hide loader
+                const mapLoader = document.getElementById('mapLoader');
+                const mapFallback = document.getElementById('mapFallback');
+                if (mapLoader && mapFallback) {
+                    mapLoader.classList.add('hidden');
+                    mapFallback.classList.remove('hidden');
+                }
+                return;
+            }
+            }
+
+            // Load Google Maps API
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=onMapsLoaded`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+
+            // Show loader state
+            const mapLoader = document.getElementById('mapLoader');
+            const mapFallback = document.getElementById('mapFallback');
+            if (mapLoader && mapFallback) {
+                mapLoader.classList.remove('hidden');
+                mapFallback.classList.add('hidden');
+            }
+        }
+
+        function onMapsLoaded() {
+            // Initialize the map when API is loaded
+            const mapContainer = document.querySelector('.map-container');
+            if (!mapContainer) return;
+
+            // Create map instance
+            const map = new google.maps.Map(document.querySelector('.map-container'), {
+                center: { lat: 24.8607, lng: 67.0183 }, // Karachi coordinates as neutral default
+                zoom: 12,
+                disableDefaultUI: true,
+                scrollwheel: false,
+                draggable: false,
+                styles: [
+                    {
+                        featureType: 'all',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+
+            // Add a neutral marker
+            const marker = new google.maps.Marker({
+                map: map,
+                title: 'Synaptic Labs',
+                position: { lat: 24.8607, lng: 67.0183 }
+            });
+
+            // Make map responsive container resize
+            window.addEventListener('resize', () => {
+                mapContainer.style.height = '400px';
+            });
+        }
+
+        // Initialize Google Maps on load
+        window.addEventListener('DOMContentLoaded', initGoogleMaps);
+    </script>
+</body>
+</html>
