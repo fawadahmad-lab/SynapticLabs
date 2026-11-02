@@ -805,7 +805,7 @@
                             Share a few details so we can understand your requirements and explore the right solution.
                         </p>
 
-                        <form id="projectInquiryForm" class="space-y-6" onsubmit="handleFormSubmit(event)">
+                        <form id="projectInquiryForm" class="space-y-6" onsubmit="handleProjectInquirySubmit(event)">
                             <!-- Full Name -->
                             <div>
                                 <label class="font-mono text-sm text-gray-300 block mb-2">Full Name</label>
@@ -1238,7 +1238,7 @@
             document.getElementById('modalSuccess').classList.add('hidden');
         }
 
-        function handleFormSubmit(e) {
+        function handleProjectInquirySubmit(e) {
             e.preventDefault();
 
             // Get form elements
