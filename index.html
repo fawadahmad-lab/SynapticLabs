@@ -1215,10 +1215,8 @@
 
         // Project Modal Logic
         function openProjectModal(prefill) {
-            const modal = document.getElementById('projectModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            goToStep1();
+            // Scroll to project inquiry form
+            document.getElementById('projectInquiryForm').scrollIntoView({behavior: 'smooth'});
         }
 
         function closeProjectModal() {
