@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="googlemaps-api-key" content="AIzaSyCp31_HmekTncanWIPvlpG2ezO8UEJssNk">
     <title>Synaptic Labs — Engineering Intelligence. Automating Possibilities.</title>
     
     <!-- Google Fonts -->
@@ -1238,6 +1239,12 @@
             document.getElementById('modalSuccess').classList.add('hidden');
         }
 
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            document.getElementById('modalStep2').classList.add('hidden');
+            document.getElementById('modalSuccess').classList.remove('hidden');
+        }
+
         function handleProjectInquirySubmit(e) {
             e.preventDefault();
 
@@ -1333,24 +1340,13 @@
             });
         });
 
-        // Google Maps API Integration
+// Google Maps API Integration
         function initGoogleMaps() {
-            // Check for API key - support both build env and plain HTML approaches
-            let apiKey = '';
+            // Read API key from meta tag (compatible with static HTML)
+            const metaKey = document.querySelector('meta[name="googlemaps-api-key"]');
+            const apiKey = metaKey ? metaKey.getAttribute('content') || '' : '';
 
-            // Try NEXT_PUBLIC_GOOGLE_MAPS_API_KEY (Vite/Next.js style)
-            if (typeof import !== 'undefined' && import.meta) {
-                apiKey = import.meta.env?.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
-            }
-
-            // Fallback: check meta tag
-            if (!apiKey) {
-                const metaKey = document.querySelector('meta[name="googlemaps-api-key"]');
-                if (metaKey) {
-                    apiKey = metaKey.getAttribute('content') || '';
-                }
-            }
-
+            // If no key or demo key, show fallback
             if (!apiKey || apiKey === 'DEMO_MAPS_API_KEY') {
                 // Show fallback, hide loader
                 const mapLoader = document.getElementById('mapLoader');
@@ -1361,6 +1357,13 @@
                 }
                 return;
             }
+
+            // Show loader state
+            const mapLoader = document.getElementById('mapLoader');
+            const mapFallback = document.getElementById('mapFallback');
+            if (mapLoader && mapFallback) {
+                mapLoader.classList.remove('hidden');
+                mapFallback.classList.add('hidden');
             }
 
             // Load Google Maps API
